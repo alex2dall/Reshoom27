@@ -243,6 +243,24 @@
 
         document.querySelectorAll('.step').forEach(s => s.style.display = 'none');
         document.getElementById('success-msg').style.display = 'block';
+        // שליחת הנתונים ל-Google Sheets של Ali Dallasheh Systems
+        const formData = {
+            p_role: document.getElementById('p_role').value,
+            p_name: document.getElementById('p_first').value + " " + document.getElementById('p_last').value,
+            p_id: document.getElementById('p_id_val').value,
+            s_name: document.getElementById('s_first').value + " " + document.getElementById('s_father').value + " " + document.getElementById('s_last_s').value,
+            s_id: document.getElementById('s_id_val').value,
+            s_dob: document.getElementById('s_dob').value,
+            grade_major: document.getElementById('sum_grade').innerText
+        };
+
+        fetch('https://script.google.com/macros/s/AKfycbzEVe1nrSCaFZzpl9gS5vKbZrpFU2tceWthNespAJMw71rv4Y1RalOIO1O1pSmPsidi/exec', {
+            method: 'POST',
+            mode: 'no-cors', 
+            body: JSON.stringify(formData)
+        }).then(() => {
+            console.log("הנתונים נשלחו לטבלה");
+        });
         window.scrollTo(0,0);
     }
 </script>
