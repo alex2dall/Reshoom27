@@ -194,80 +194,63 @@
 <footer>Powered by: Ali Dallasheh Systems 2026</footer>
 
 <script>
-    let uploadedFileData = "";
+    let currentStep = 1;
 
-    function goToStep(step) {
-        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-        document.getElementById('step' + step).classList.add('active');
-        window.scrollTo(0,0);
+    function nextStep(step) {
+        document.getElementById('step' + currentStep).classList.remove('active');
+        currentStep = step;
+        document.getElementById('step' + currentStep).classList.add('active');
     }
 
-    function validateAndNext(current, next) {
-        const activeStep = document.getElementById('step' + current);
-        const inputs = activeStep.querySelectorAll('input[required], select[required]');
-        let valid = true;
-        inputs.forEach(i => { if(!i.checkValidity()) { i.reportValidity(); valid = false; } });
-        if(valid) goToStep(next);
+    function prevStep(step) {
+        document.getElementById('step' + currentStep).classList.remove('active');
+        currentStep = step;
+        document.getElementById('step' + currentStep).classList.add('active');
     }
 
-    function toggleMajor() {
-        const grade = document.getElementById('grade').value;
-        document.getElementById('major_box').style.display = (grade === 'י') ? 'block' : 'none';
-    }
-
-    function handleFile(input) {
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = function(e) { 
-            uploadedFileData = e.target.result; 
-            document.getElementById('preview-img').src = uploadedFileData;
-        }
-        if(file) reader.readAsDataURL(file);
-    }
-
-    function generateSummary() {
-        if(!document.getElementById('file_input').files[0]) {
-            alert("נא לצרף צילום ספח תעודת זהות לפני הסיום");
-            return;
-        }
+    // פונקציית שליחת הטופס לגוגל שיטס
+    function submitToGoogleSheets() {
+        // כאן עליך להדביק את הכתובת שקיבלת מגוגל (ה-URL של ה-Web App)
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyZmScrcI-0obGyUKKq3Ep1kkb4M3yg982f1899Z69sy5bpoy4NA8FLPkPyXXWaSBf7/exec'; 
         
-        document.getElementById('sum_p_name').innerText = document.getElementById('p_role').value + ": " + document.getElementById('p_first').value + " " + document.getElementById('p_last').value;
-        document.getElementById('sum_p_id').innerText = document.getElementById('p_id_val').value;
-        document.getElementById('sum_s_name').innerText = document.getElementById('s_first').value + " " + document.getElementById('s_father').value + " " + document.getElementById('s_last_s').value;
-        document.getElementById('sum_s_id').innerText = document.getElementById('s_id_val').value;
-        document.getElementById('sum_s_dob').innerText = document.getElementById('s_dob').value;
-        
-        const g = document.getElementById('grade').value;
-        const m = (g === 'י') ? " (מגמת " + document.getElementById('major').value + ")" : "";
-        const finalGrade = "שכבה " + g + m;
-        document.getElementById('sum_grade').innerText = finalGrade;
+        const btn = document.querySelector('.btn-success');
+        btn.disabled = true;
+        btn.innerText = "שולח נתונים...";
 
-        document.querySelectorAll('.step').forEach(s => s.style.display = 'none');
+        // איסוף הנתונים מהשדות
+        const formData = new FormData();
+        formData.append('student_name', document.getElementById('student_name').value);
+        formData.append('student_id', document.getElementById('student_id').value);
+        formData.append('phone', document.getElementById('phone').value);
+        formData.append('track', document.getElementById('track').value);
+        // הוסף כאן שדות נוספים אם ישנם בטופס שלך
+
+        fetch(scriptURL, { method: 'POST', body: formData})
+            .then(response => {
+                alert('הנתונים נשלחו בהצלחה!');
+                showSummary(); // מעבר לתצוגת סיכום והדפסה
+            })
+            .catch(error => {
+                console.error('Error!', error.message);
+                alert('שגיאה בשליחת הנתונים. נסה שוב.');
+                btn.disabled = false;
+                btn.innerText = "סיום והדפסה";
+            });
+    }
+
+    function showSummary() {
+        document.getElementById('step3').classList.remove('active');
         document.getElementById('success-msg').style.display = 'block';
+        
+        // מילוי נתוני הסיכום
+        document.getElementById('sum-name').innerText = document.getElementById('student_name').value;
+        document.getElementById('sum-id').innerText = document.getElementById('student_id').value;
+        document.getElementById('sum-phone').innerText = document.getElementById('phone').value;
+        document.getElementById('sum-track').innerText = document.getElementById('track').options[document.getElementById('track').selectedIndex].text;
+    }
 
-        // בניית האובייקט למשלוח
-        const formData = {
-            p_role: document.getElementById('p_role').value,
-            p_name: document.getElementById('p_first').value + " " + document.getElementById('p_last').value,
-            p_id: document.getElementById('p_id_val').value,
-            s_name: document.getElementById('s_first').value + " " + document.getElementById('s_father').value + " " + document.getElementById('s_last_s').value,
-            s_id: document.getElementById('s_id_val').value,
-            s_dob: document.getElementById('s_dob').value,
-            grade_major: finalGrade,
-            id_photo: uploadedFileData 
-        };
-
-        fetch('https://script.google.com/macros/s/AKfycbzzXf-JCC3ItJWecdz1vpAcOjUEOVBQ12GefqbPQKbphFtTY3r0vKvNYh7bovtBwaIs/exec', {
-            method: 'POST',
-            mode: 'no-cors', 
-            body: JSON.stringify(formData)
-        }).then(() => {
-            console.log("הנתונים נשלחו בהצלחה ל-Ali Dallasheh Systems");
-        }).catch(err => {
-            console.error("שגיאה בשליחה:", err);
-        });
-
-        window.scrollTo(0,0);
+    function printForm() {
+        window.print();
     }
 </script>
 
