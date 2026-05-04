@@ -239,31 +239,34 @@
         
         const g = document.getElementById('grade').value;
         const m = (g === 'י') ? " (מגמת " + document.getElementById('major').value + ")" : "";
-        document.getElementById('sum_grade').innerText = "שכבה " + g + m;
+        const finalGrade = "שכבה " + g + m;
+        document.getElementById('sum_grade').innerText = finalGrade;
 
         document.querySelectorAll('.step').forEach(s => s.style.display = 'none');
         document.getElementById('success-msg').style.display = 'block';
-        // שליחת הנתונים ל-Google Sheets של Ali Dallasheh Systems
-   const formData = {
+
+        // בניית האובייקט למשלוח
+        const formData = {
             p_role: document.getElementById('p_role').value,
             p_name: document.getElementById('p_first').value + " " + document.getElementById('p_last').value,
             p_id: document.getElementById('p_id_val').value,
             s_name: document.getElementById('s_first').value + " " + document.getElementById('s_father').value + " " + document.getElementById('s_last_s').value,
             s_id: document.getElementById('s_id_val').value,
             s_dob: document.getElementById('s_dob').value,
-            grade_major: document.getElementById('sum_grade').innerText,
-            // זו השורה החדשה והחשובה:
+            grade_major: finalGrade,
             id_photo: uploadedFileData 
         };
-        
 
         fetch('https://script.google.com/macros/s/AKfycbwWp6v1NogJHLwnJNJUiIgIl8KJQV9QaaDoTfxp1NWW3a9JaZZ81L1I_dnC4atfUg4l/exec', {
             method: 'POST',
             mode: 'no-cors', 
             body: JSON.stringify(formData)
         }).then(() => {
-            console.log("הנתונים נשלחו לטבלה");
+            console.log("הנתונים נשלחו בהצלחה ל-Ali Dallasheh Systems");
+        }).catch(err => {
+            console.error("שגיאה בשליחה:", err);
         });
+
         window.scrollTo(0,0);
     }
 </script>
