@@ -208,31 +208,36 @@
         document.getElementById('step' + currentStep).classList.add('active');
     }
 
-    // פונקציית שליחת הטופס לגוגל שיטס
+    // פונקציית השליחה המעודכנת
     function submitToGoogleSheets() {
-        // כאן עליך להדביק את הכתובת שקיבלת מגוגל (ה-URL של ה-Web App)
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyZmScrcI-0obGyUKKq3Ep1kkb4M3yg982f1899Z69sy5bpoy4NA8FLPkPyXXWaSBf7/exec'; 
+        const scriptURL = 'הדבק_כאן_את_הקישור_שלך'; 
         
         const btn = document.querySelector('.btn-success');
         btn.disabled = true;
         btn.innerText = "שולח נתונים...";
 
-        // איסוף הנתונים מהשדות
         const formData = new FormData();
-        formData.append('student_name', document.getElementById('student_name').value);
-        formData.append('student_id', document.getElementById('student_id').value);
-        formData.append('phone', document.getElementById('phone').value);
-        formData.append('track', document.getElementById('track').value);
-        // הוסף כאן שדות נוספים אם ישנם בטופס שלך
+        
+        // מיפוי מדויק לעמודות מהצילום (image_470847.png) + תוספות שביקשת
+        formData.append('p_role', document.getElementById('parent_role')?.value || 'אבא'); 
+        formData.append('p_name', document.getElementById('parent_name').value);
+        formData.append('p_id', document.getElementById('parent_id').value);
+        formData.append('p_phone', document.getElementById('parent_phone').value); // טלפון הורה
+        
+        formData.append('s_name', document.getElementById('student_name').value);
+        formData.append('s_id', document.getElementById('student_id').value);
+        formData.append('s_dob', document.getElementById('student_dob').value);
+        formData.append('s_phone', document.getElementById('student_phone').value); // טלפון תלמיד
+        
+        formData.append('grade_major', document.getElementById('track').value);
 
         fetch(scriptURL, { method: 'POST', body: formData})
             .then(response => {
-                alert('הנתונים נשלחו בהצלחה!');
-                showSummary(); // מעבר לתצוגת סיכום והדפסה
+                showSummary(); 
             })
             .catch(error => {
                 console.error('Error!', error.message);
-                alert('שגיאה בשליחת הנתונים. נסה שוב.');
+                alert('שגיאה בשליחה. בדוק חיבור אינטרנט.');
                 btn.disabled = false;
                 btn.innerText = "סיום והדפסה";
             });
@@ -242,10 +247,9 @@
         document.getElementById('step3').classList.remove('active');
         document.getElementById('success-msg').style.display = 'block';
         
-        // מילוי נתוני הסיכום
+        // עדכון תצוגת הסיכום למסך
         document.getElementById('sum-name').innerText = document.getElementById('student_name').value;
         document.getElementById('sum-id').innerText = document.getElementById('student_id').value;
-        document.getElementById('sum-phone').innerText = document.getElementById('phone').value;
         document.getElementById('sum-track').innerText = document.getElementById('track').options[document.getElementById('track').selectedIndex].text;
     }
 
